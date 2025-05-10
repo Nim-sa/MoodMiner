@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>MoodMiner</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    button {
+      background: #1DB954;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 20px;
+      cursor: pointer;
+      margin: 10px 0;
+    }
+    button:hover {
+      background: #1ed760;
+    }
+  </style>
+</head>
+<body>
+  <h1>MoodMiner</h1>
+  
+  <!-- Spotify Login Button -->
+  <a id="spotify-login" class="button" href="#">Login with Spotify</a>
+  
+  <!-- Weather Button -->
+  <button id="weather-btn">Get Weather</button>
+  
+  <!-- Weather Result Display -->
+  <div id="weather-result" style="margin-top: 20px;"></div>
+
+  <script>
+    // Initialize Spotify Login
+    document.getElementById('spotify-login').href = 
+      `https://accounts.spotify.com/authorize?client_id=8a19ee685a0245d79e8000662fb28534&response_type=code&redirect_uri=${encodeURIComponent("https://mood-miner.vercel.app/api/callback")}&scope=user-read-recently-played`;
+    
+    // Weather Button Handler
+    document.getElementById('weather-btn').addEventListener('click', async () => {
+      const city = prompt("Enter your city:");
+      if (!city) return;
+      
+      try {
+        const response = await fetch(`/api/weather?city=${encodeURIComponent(city)}`);
+        if (!response.ok) throw new Error(await response.text());
+        
+        const weather = await response.json();
+        document.getElementById('weather-result').innerHTML = `
+          <h3>Weather in ${weather.name}</h3>
+          <p>${weather.weather[0].description}</p>
+          <p>Temperature: ${Math.round(weather.main.temp)}°C</p>
+        `;
+      } catch (error) {
+        document.getElementById('weather-result').innerHTML = `
+          <p style="color: red">Error: ${error.message}</p>
+        `;
+      }
+    });
+  </script>
+</body>
+</html>
